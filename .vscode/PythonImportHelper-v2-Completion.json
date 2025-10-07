@@ -21,7 +21,16 @@
         "kind": 2,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "def proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append(proxy)\n        else:\n            print(f\"Proxy {proxy} returned status code {response.status_code}.\")",
+        "peekOfCode": "def proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append((proxy, country))\n        else:",
+        "detail": "proxy_rotation",
+        "documentation": {}
+    },
+    {
+        "label": "get_working_proxies",
+        "kind": 2,
+        "importPath": "proxy_rotation",
+        "description": "proxy_rotation",
+        "peekOfCode": "def get_working_proxies():\n    with ThreadPoolExecutor(max_workers=100) as executor:\n        executor.map(proxy_test, proxy_list)\n    return working_proxies\nprint(get_working_proxies())",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -30,7 +39,7 @@
         "kind": 5,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "proxies_response = requests.get(\n    \"https://proxylist.geonode.com/api/proxy-list?filterLastChecked=4&limit=500&page=1&sort_by=lastChecked&sort_type=desc\")\nproxies_json = proxies_response.json()\nworking_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:",
+        "peekOfCode": "proxies_response = requests.get(\n    \"https://proxylist.geonode.com/api/proxy-list?filterLastChecked=4&limit=500&page=1&sort_by=lastChecked&sort_type=desc\")\nproxies_json = proxies_response.json()\nworking_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -39,7 +48,7 @@
         "kind": 5,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "proxies_json = proxies_response.json()\nworking_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append(proxy)",
+        "peekOfCode": "proxies_json = proxies_response.json()\nworking_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -48,7 +57,7 @@
         "kind": 5,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "working_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append(proxy)\n        else:",
+        "peekOfCode": "working_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append((proxy, country))",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -57,7 +66,7 @@
         "kind": 5,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "proxy_list = []\nfor item in proxies_json.get(\"data\", []):\n    ip = item.get(\"ip\")\n    port = item.get(\"port\")\n    protocol = item.get(\"protocols\")[0]\n    if ip and port:\n        proxy_list.append(f\"{protocol}://{ip}:{port}\")\n# Test proxies in parallel\nwith ThreadPoolExecutor(max_workers=100) as executor:\n    executor.map(proxy_test, proxy_list)",
+        "peekOfCode": "proxy_list = []\nfor item in proxies_json.get(\"data\", []):\n    ip = item.get(\"ip\")\n    port = item.get(\"port\")\n    protocol = item.get(\"protocols\")[0]\n    country = item.get(\"country\")\n    if ip and port:\n        proxy_list.append(f\"{protocol}://{ip}:{port}#{country}\")\n# Test proxies in parallel\ndef get_working_proxies():",
         "detail": "proxy_rotation",
         "documentation": {}
     }

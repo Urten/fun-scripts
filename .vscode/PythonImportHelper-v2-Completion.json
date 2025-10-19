@@ -1,5 +1,21 @@
 [
     {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "JSONResponse",
+        "importPath": "fastapi.responses",
+        "description": "fastapi.responses",
+        "isExtraImport": true,
+        "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
         "label": "requests",
         "kind": 6,
         "isExtraImport": true,
@@ -21,7 +37,16 @@
         "kind": 2,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "def proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append((proxy, country))\n        else:",
+        "peekOfCode": "def proxy_test(proxy):\n    try:\n        # remove country info\n        proxy_no_country = proxy.split(\"#\")[0]\n        protocol = proxy_no_country.split(\"://\")[0].lower()\n        # use same proxy for both http and https requests\n        proxies = {\"http\": proxy_no_country, \"https\": proxy_no_country}\n        # avoid env proxy/no_proxy interfering\n        session = requests.Session()\n        session.trust_env = False",
+        "detail": "proxy_rotation",
+        "documentation": {}
+    },
+    {
+        "label": "get_working_proxies_list",
+        "kind": 2,
+        "importPath": "proxy_rotation",
+        "description": "proxy_rotation",
+        "peekOfCode": "def get_working_proxies_list(workers=100):\n    proxy_list = []\n    for item in proxies_json.get(\"data\", []):\n        ip = item.get(\"ip\")\n        port = item.get(\"port\")\n        protocol = item.get(\"protocols\")[0]\n        country = item.get(\"country\")\n        if ip and port:\n            proxy_list.append(f\"{protocol}://{ip}:{port}#{country}\")\n    working_proxies = []",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -30,7 +55,16 @@
         "kind": 2,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "def get_working_proxies():\n    with ThreadPoolExecutor(max_workers=100) as executor:\n        executor.map(proxy_test, proxy_list)\n    return working_proxies\nprint(get_working_proxies())",
+        "peekOfCode": "def get_working_proxies():\n    return JSONResponse(content={\"working_proxies\": get_working_proxies_list(workers=200)})\nif __name__ == \"__main__\":\n    print(get_working_proxies_list(workers=200))",
+        "detail": "proxy_rotation",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "proxy_rotation",
+        "description": "proxy_rotation",
+        "peekOfCode": "app = FastAPI()\nproxies_response = requests.get(\n    \"https://proxylist.geonode.com/api/proxy-list?filterLastChecked=4&limit=500&page=1&sort_by=lastChecked&sort_type=desc\")\nproxies_json = proxies_response.json()\ndef proxy_test(proxy):\n    try:\n        # remove country info\n        proxy_no_country = proxy.split(\"#\")[0]\n        protocol = proxy_no_country.split(\"://\")[0].lower()\n        # use same proxy for both http and https requests",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -39,7 +73,7 @@
         "kind": 5,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "proxies_response = requests.get(\n    \"https://proxylist.geonode.com/api/proxy-list?filterLastChecked=4&limit=500&page=1&sort_by=lastChecked&sort_type=desc\")\nproxies_json = proxies_response.json()\nworking_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)",
+        "peekOfCode": "proxies_response = requests.get(\n    \"https://proxylist.geonode.com/api/proxy-list?filterLastChecked=4&limit=500&page=1&sort_by=lastChecked&sort_type=desc\")\nproxies_json = proxies_response.json()\ndef proxy_test(proxy):\n    try:\n        # remove country info\n        proxy_no_country = proxy.split(\"#\")[0]\n        protocol = proxy_no_country.split(\"://\")[0].lower()\n        # use same proxy for both http and https requests\n        proxies = {\"http\": proxy_no_country, \"https\": proxy_no_country}",
         "detail": "proxy_rotation",
         "documentation": {}
     },
@@ -48,25 +82,7 @@
         "kind": 5,
         "importPath": "proxy_rotation",
         "description": "proxy_rotation",
-        "peekOfCode": "proxies_json = proxies_response.json()\nworking_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")",
-        "detail": "proxy_rotation",
-        "documentation": {}
-    },
-    {
-        "label": "working_proxies",
-        "kind": 5,
-        "importPath": "proxy_rotation",
-        "description": "proxy_rotation",
-        "peekOfCode": "working_proxies = []\ndef proxy_test(proxy):\n    try:\n        protocol = proxy.split(\"://\")[0]\n        country = proxy.split(\"#\")[1]\n        proxies = {protocol: proxy}\n        response = requests.get(\"http://httpbin.org/ip\", proxies=proxies, timeout=5)\n        if response.status_code == 200:\n            print(f\"Proxy {proxy} is working.\")\n            working_proxies.append((proxy, country))",
-        "detail": "proxy_rotation",
-        "documentation": {}
-    },
-    {
-        "label": "proxy_list",
-        "kind": 5,
-        "importPath": "proxy_rotation",
-        "description": "proxy_rotation",
-        "peekOfCode": "proxy_list = []\nfor item in proxies_json.get(\"data\", []):\n    ip = item.get(\"ip\")\n    port = item.get(\"port\")\n    protocol = item.get(\"protocols\")[0]\n    country = item.get(\"country\")\n    if ip and port:\n        proxy_list.append(f\"{protocol}://{ip}:{port}#{country}\")\n# Test proxies in parallel\ndef get_working_proxies():",
+        "peekOfCode": "proxies_json = proxies_response.json()\ndef proxy_test(proxy):\n    try:\n        # remove country info\n        proxy_no_country = proxy.split(\"#\")[0]\n        protocol = proxy_no_country.split(\"://\")[0].lower()\n        # use same proxy for both http and https requests\n        proxies = {\"http\": proxy_no_country, \"https\": proxy_no_country}\n        # avoid env proxy/no_proxy interfering\n        session = requests.Session()",
         "detail": "proxy_rotation",
         "documentation": {}
     }
